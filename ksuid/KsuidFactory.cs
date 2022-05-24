@@ -14,20 +14,20 @@ public static class KsuidFactory
 	/// </summary>
 	const int StringEncodedLength = 27;
 
-    /// <summary>
-    /// Timestamp is a uint32.
-    /// </summary>
-    const int TimestampLengthInBytes = 4;
+	/// <summary>
+	/// Timestamp is a uint32.
+	/// </summary>
+	const int TimestampLengthInBytes = 4;
 
-    /// <summary>
-    /// Payload is 16-bytes.
-    /// </summary>
-    const int PayloadLengthInBytes = 16;
+	/// <summary>
+	/// Payload is 16-bytes.
+	/// </summary>
+	const int PayloadLengthInBytes = 16;
 
-    /// <summary>
-    /// KSUIDs are 20 bytes when binary encoded.
-    /// </summary>
-    const int ByteLength = TimestampLengthInBytes + PayloadLengthInBytes;
+	/// <summary>
+	/// KSUIDs are 20 bytes when binary encoded.
+	/// </summary>
+	const int ByteLength = TimestampLengthInBytes + PayloadLengthInBytes;
 
 	/// <summary>
 	/// KSUID's epoch starts more recently so that the 32-bit number space gives a
@@ -39,9 +39,9 @@ public static class KsuidFactory
 	/// <summary>
 	/// The number of seconds at epoch.
 	/// </summary>
-    const long EpochSeconds = 62_135_596_800;
+	const long EpochSeconds = 62_135_596_800;
 
-    const long EpochDelta = EpochSeconds - EpochStamp;
+	const long EpochDelta = EpochSeconds - EpochStamp;
 
 	/// <summary>
 	/// Generates a random KSUID using the current time and optional prefix.
