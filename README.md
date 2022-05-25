@@ -13,6 +13,12 @@ tl;dr
 - uses crypto PRNG to generate random bits
 - unit-tested
 
+## installation
+
+``` sh
+$ dotnet add package KsuidDotNet
+```
+
 ## how to use
 
 Creating a random KSUID `string`:

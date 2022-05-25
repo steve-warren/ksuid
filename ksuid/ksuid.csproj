@@ -5,6 +5,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
+    <PackageId>KsuidDotNet</PackageId>
+    <Version>1.0.1</Version>
+    <Authors>Steve Warren</Authors>
+    <PackageTags>ksuid;uuid;guid;base62</PackageTags>
+    <RepositoryUrl>https://github.com/steve-warren/ksuid.git</RepositoryUrl> 
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
 </Project>
