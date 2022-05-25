@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+    <PackageReference Include="ksuid" Version="1.0.0" />
+    <PackageReference Include="StructKsuid" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>

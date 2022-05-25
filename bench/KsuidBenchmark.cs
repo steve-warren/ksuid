@@ -7,8 +7,20 @@ namespace KsuidDotNet.Bench;
 public class KsuidBenchmark
 {
     [Benchmark]
-    public void KsuidTest()
+    public void KsuidDotNet_NewKsuid()
     {
-		_ = Ksuid.NewKsuid(RandomNumberGenerator.Create(), DateTime.UtcNow, "cu_");
+		_ = KsuidDotNet.Ksuid.NewKsuid();
+	}
+
+    [Benchmark]
+    public void StructKsuid_RandomKsuidToString()
+    {
+		_ = StructKsuid.Ksuid.RandomKsuid().ToString();
+	}
+
+    [Benchmark]
+    public void DotKsuid_GenerateToString()
+    {
+		_ = KSUID.Ksuid.Generate().ToString();
 	}
 }
