@@ -41,7 +41,24 @@ public static class KsuidFactory
     /// </summary>
     const long EpochSeconds = 62_135_596_800;
 
-    const long EpochDelta = EpochSeconds - EpochStamp;
+    const long EpochDelta = EpochSeconds + EpochStamp;
+
+	public static readonly DateTime MaxTimestamp = new(678305640950000000L);
+
+    /// <summary>
+    /// Generates a random KSUID using the current time.
+    /// </summary>
+    /// <returns></returns>
+    public static string New()
+        => New(RandomNumberGenerator.Create(), DateTime.UtcNow, default); // RNG Create method points to a singleton whose Dispose method no-ops
+
+    /// <summary>
+    /// Generates a random KSUID using the current time and optional prefix.
+    /// </summary>
+    /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
+    /// <returns></returns>
+    public static string New(ReadOnlySpan<char> prefix = default)
+        => New(RandomNumberGenerator.Create(), DateTime.UtcNow, prefix); // RNG Create method points to a singleton whose Dispose method no-ops
 
     /// <summary>
     /// Generates a random KSUID using the current time and optional prefix.
@@ -52,14 +69,14 @@ public static class KsuidFactory
     public static string New(RandomNumberGenerator rng, ReadOnlySpan<char> prefix = default)
         => New(rng, DateTime.UtcNow, prefix);
 
-    /// <summary>
-    /// Generates a random KSUID using the specified time and optional prefix.
-    /// </summary>
-    /// <param name="rng">An instance of the RandomNumberGenerator class.</param>
-    /// <param name="utcTime">A DateTime object in UTC format.</param>
-    /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
-    /// <returns></returns>
-    public static string New(RandomNumberGenerator rng, DateTime utcTime, ReadOnlySpan<char> prefix)
+	/// <summary>
+	/// Generates a random KSUID using the specified time and optional prefix.
+	/// </summary>
+	/// <param name="rng">An instance of the RandomNumberGenerator class.</param>
+	/// <param name="utcTime">A DateTime object in UTC format.</param>
+	/// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
+	/// <returns></returns>
+	public static string New(RandomNumberGenerator rng, DateTime utcTime, ReadOnlySpan<char> prefix)
     {
         // allocate 20 bytes to hold the entire KSUID value
         Span<byte> ksuid = stackalloc byte[ByteLength];
@@ -70,13 +87,13 @@ public static class KsuidFactory
 
         rng.GetBytes(payloadSlice);
 
-        // converts current ticks into seconds, then
-        // subtracts the number of seconds since custom epoch
-        var ts = utcTime.Ticks / TicksPerSecond - EpochDelta;
+		// converts current ticks into seconds, then
+		// subtracts the number of seconds since custom epoch
+		long ts = utcTime.Ticks / TicksPerSecond - EpochDelta;
 
-        // stores the time value in the first 4
-        // bytes of the KSUID, encoding it into big endian
-        ksuid[0] = (byte) (ts >> 24);
+		// stores the time value in the first 4
+		// bytes of the KSUID, encoding it into big endian
+		ksuid[0] = (byte) (ts >> 24);
         ksuid[1] = (byte) (ts >> 16);
         ksuid[2] = (byte) (ts >> 8);
         ksuid[3] = (byte) ts;
@@ -139,7 +156,7 @@ public static class KsuidFactory
             dest[i] = '0';
 
         // add prefix
-        _ = prefix[prefixLength - 1]; // opt
+        //_ = prefix[prefixLength - 1]; // opt
 
         for (var i = 0; i < prefixLength; i ++)
             dest[i] = prefix[i];
