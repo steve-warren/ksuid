@@ -43,7 +43,9 @@ c_29faSiN1gPB6IzM74u6tMfTO02L
 
 ## micro benchmarks
 
-Benchmark results for KsuidDotNet and other KSUID libraries:
+Benchmark results for KsuidDotNet and other KSUID libraries.
+
+## generate random KSUID
 
 ```
 BenchmarkDotNet=v0.13.1, OS=macOS Monterey 12.2.1 (21D62) [Darwin 21.3.0]
@@ -73,6 +75,27 @@ Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
 |            KsuidDotNet_NewKsuid |   443.8 ns | 0.73 ns | 0.68 ns | 0.0381 |      80 B |
 | StructKsuid_RandomKsuidToString |   579.8 ns | 1.03 ns | 0.97 ns | 0.0381 |      80 B |
 |       DotKsuid_GenerateToString | 3,274.2 ns | 5.27 ns | 4.93 ns | 3.7384 |   7,824 B |
+```
+
+## generate random KSUID with prefix
+
+```
+BenchmarkDotNet=v0.13.1, OS=macOS Monterey 12.3.1 (21E258) [Darwin 21.4.0]
+Apple M1 Max, 1 CPU, 10 logical and 10 physical cores
+.NET SDK=6.0.300
+  [Host]     : .NET 6.0.5 (6.0.522.21309), Arm64 RyuJIT
+  DefaultJob : .NET 6.0.5 (6.0.522.21309), Arm64 RyuJIT
+
+
+|                                    Method |       Mean |   Error |  StdDev |  Gen 0 | Allocated |
+|------------------------------------------ |-----------:|--------:|--------:|-------:|----------:|
+|                      KsuidDotNet_NewKsuid |   444.5 ns | 0.48 ns | 0.42 ns | 0.0381 |      80 B |
+|           StructKsuid_RandomKsuidToString |   579.1 ns | 1.41 ns | 1.32 ns | 0.0381 |      80 B |
+|                 DotKsuid_GenerateToString | 3,279.7 ns | 8.14 ns | 7.61 ns | 3.7384 |   7,824 B |
+|                                                                                                 |
+|           KsuidDotNet_NewKsuid_WithPrefix |   450.8 ns | 0.95 ns | 0.84 ns | 0.0381 |      80 B |
+| StructKsuid_RandomKsuidToStringWithPrefix |   592.4 ns | 1.21 ns | 1.07 ns | 0.0763 |     160 B |
+|       DotKsuid_GenerateToStringWithPrefix | 3,299.6 ns | 5.80 ns | 5.43 ns | 3.7766 |   7,904 B |
 ```
 
 ## license
