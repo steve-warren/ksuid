@@ -10,7 +10,7 @@ public class KsuidTests
     readonly byte[] MaxPayload = Enumerable.Range(0, 16).Select(_ => (byte)0xFF).ToArray();
 
     [Fact]
-    public void MinKsuidValue()
+    public void GivenMinPayloadAndMinTimestamp_When_GeneratingNewKsuid_ReturnMinString()
     {
         var id = Ksuid.NewKsuid(new RngStub(MinPayload), Ksuid.MinTimestamp, string.Empty);
 
@@ -18,7 +18,7 @@ public class KsuidTests
     }
 
     [Fact]
-    public void MaxKsuidValue()
+    public void GivenMaxPayloadAndMaxTimestamp_When_GeneratingNewKsuid_ReturnMaxString()
     {
         var id = Ksuid.NewKsuid(new RngStub(MaxPayload), Ksuid.MaxTimestamp, string.Empty);
 
@@ -26,14 +26,32 @@ public class KsuidTests
     }
 
     [Fact]
-    public void Given_Ksuid_When_TimestampOverflows_Then_Throw()
+    public void Given_OverflowedTimestamp_When_GeneratingNewKsuid_Then_Throw()
     {
-        FluentActions.Invoking(() => Ksuid.NewKsuid(new RngStub(MinPayload), Ksuid.MaxTimestamp.AddSeconds(1), string.Empty)).Should().Throw<ArgumentOutOfRangeException>(because: "the timestamp overflowed.");
+        FluentActions.Invoking(() => Ksuid.NewKsuid(Ksuid.MaxTimestamp.AddSeconds(1))).Should().Throw<ArgumentOutOfRangeException>(because: "the timestamp overflowed.");
     }
 
     [Fact]
-    public void Given_Ksuid_When_TimestampUderflows_Then_Throw()
+    public void Given_UnderflowedTimestamp_When_GeneratingNewKsuid_Then_Throw()
     {
-        FluentActions.Invoking(() => Ksuid.NewKsuid(new RngStub(MinPayload), Ksuid.MinTimestamp.AddSeconds(-1), string.Empty)).Should().Throw<ArgumentOutOfRangeException>(because: "the timestamp underflowed.");
+        FluentActions.Invoking(() => Ksuid.NewKsuid(Ksuid.MinTimestamp.AddSeconds(-1))).Should().Throw<ArgumentOutOfRangeException>(because: "the timestamp underflowed.");
+    }
+
+    [Fact]
+    public void Given_Prefix_When_GeneratingNewKsuid_Then_ReturnKsuidWithPrefix()
+    {
+        var prefix = "aaa_";
+
+        var id = Ksuid.NewKsuid(prefix);
+
+        id.Should().StartWith(prefix, because: "it should have a prefix.");
+    }
+
+    [Fact]
+    public void Given_TooLongPrefix_When_GeneratingNewKsuid_Then_Throw()
+    {
+        var prefix = "a".PadRight(Ksuid.MaxPrefixLength + 1);
+
+        FluentActions.Invoking(() => Ksuid.NewKsuid(prefix)).Should().Throw<ArgumentOutOfRangeException>(because: "the prefix is too long.");
     }
 }

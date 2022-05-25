@@ -57,7 +57,7 @@ public static class Ksuid
     /// <summary>
     /// Generates a random KSUID using the specified time.
     /// </summary>
-	/// <param name="utcTime">A DateTime object in UTC format.</param>
+    /// <param name="utcTime">A DateTime object in UTC format.</param>
     public static string NewKsuid(DateTime utcNow) => NewKsuid(utcNow, default);
 
     /// <summary>
@@ -70,19 +70,19 @@ public static class Ksuid
     /// <summary>
     /// Generates a random KSUID using the current time and prefix.
     /// </summary>
-	/// <param name="utcTime">A DateTime object in UTC format.</param>
+    /// <param name="utcTime">A DateTime object in UTC format.</param>
     /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
     /// <returns>A 20-byte KSUID encoded in Base 62 format.</returns>
     public static string NewKsuid(DateTime utcTime, ReadOnlySpan<char> prefix)
         => NewKsuid(RandomNumberGenerator.Create(), utcTime, prefix);
 
-	/// <summary>
-	/// Generates a random KSUID using the specified RNG, time, and prefix.
-	/// </summary>
-	/// <param name="rng">An instance of the RandomNumberGenerator class.</param>
-	/// <param name="utcTime">A DateTime object in UTC format.</param>
-	/// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
-	/// <returns>A 20-byte KSUID encoded in Base 62 format.</returns>
+    /// <summary>
+    /// Generates a random KSUID using the specified RNG, time, and prefix.
+    /// </summary>
+    /// <param name="rng">An instance of the RandomNumberGenerator class.</param>
+    /// <param name="utcTime">A DateTime object in UTC format.</param>
+    /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
+    /// <returns>A 20-byte KSUID encoded in Base 62 format.</returns>
     public static string NewKsuid(RandomNumberGenerator rng!!, DateTime utcTime, ReadOnlySpan<char> prefix)
     {
         if (utcTime.Kind is not DateTimeKind.Utc)
@@ -100,13 +100,13 @@ public static class Ksuid
         // write 16 random bytes to payload slice; this call is thread-safe.
         rng.GetBytes(ksuid.Slice(TimestampLengthInBytes, PayloadLengthInBytes));
 
-		// converts current ticks into seconds, then
-		// subtracts the number of seconds since custom epoch
-		long ts = utcTime.Ticks / TimeSpan.TicksPerSecond - KsuidEpochSeconds;
+        // converts current ticks into seconds, then
+        // subtracts the number of seconds since custom epoch
+        long ts = utcTime.Ticks / TimeSpan.TicksPerSecond - KsuidEpochSeconds;
 
-		// stores the time value in the first 4
-		// bytes of the KSUID, encoding it into big endian
-		ksuid[0] = (byte) (ts >> 24);
+        // stores the time value in the first 4
+        // bytes of the KSUID, encoding it into big endian
+        ksuid[0] = (byte) (ts >> 24);
         ksuid[1] = (byte) (ts >> 16);
         ksuid[2] = (byte) (ts >> 8);
         ksuid[3] = (byte) ts;
@@ -154,7 +154,7 @@ public static class Ksuid
             }
 
             // Writes at the end of the destination buffer because we computed the
-		    // lowest bits first.
+            // lowest bits first.
             n--;
 
             // set the char to the output array
@@ -169,7 +169,7 @@ public static class Ksuid
         }
 
         // Add padding at the head of the destination buffer for all bytes that were
-	    // not set.
+        // not set.
         while(n-- > 0)
             dest[prefixLength + n] = '0';
 
