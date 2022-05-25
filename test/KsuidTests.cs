@@ -5,24 +5,20 @@ namespace KsuidDotNet.Tests;
 
 public class KsuidTests
 {
-    readonly byte[] MinPayload = Enumerable.Range(0, 16).Select(_ => (byte)0x00).ToArray();
-
-    readonly byte[] MaxPayload = Enumerable.Range(0, 16).Select(_ => (byte)0xFF).ToArray();
-
     [Fact]
     public void GivenMinPayloadAndMinTimestamp_When_GeneratingNewKsuid_ReturnMinString()
     {
-        var id = Ksuid.NewKsuid(new RngStub(MinPayload), Ksuid.MinTimestamp, string.Empty);
+        var id = Ksuid.NewKsuid(new RngStub(Ksuid.MinPayload), Ksuid.MinTimestamp, string.Empty);
 
-        id.Should().Be("000000000000000000000000000", because: "it is the minimum value for a KSUID.");
+        id.Should().Be(Ksuid.MinString, because: "it is the minimum value for a KSUID.");
     }
 
     [Fact]
     public void GivenMaxPayloadAndMaxTimestamp_When_GeneratingNewKsuid_ReturnMaxString()
     {
-        var id = Ksuid.NewKsuid(new RngStub(MaxPayload), Ksuid.MaxTimestamp, string.Empty);
+        var id = Ksuid.NewKsuid(new RngStub(Ksuid.MaxPayload), Ksuid.MaxTimestamp, string.Empty);
 
-        id.Should().Be("aWgEPTl1tmebfsQzFP4bxwgy80V", because: "it is the maximum value for a KSUID.");
+        id.Should().Be(Ksuid.MaxString, because: "it is the maximum value for a KSUID.");
     }
 
     [Fact]

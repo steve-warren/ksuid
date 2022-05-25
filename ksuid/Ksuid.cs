@@ -2,73 +2,108 @@
 
 namespace KsuidDotNet;
 
+/// <summary>
+/// Represents a K-Sortable Unique IDentifier.
+/// </summary>
 public static class Ksuid
 {
-    const string Base62Characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    const int DestBase = 62;
-    const ulong SourceBase = 4_294_967_296;
+    private const string Base62Characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private const int DestBase = 62;
+    private const ulong SourceBase = 4_294_967_296;
 
     /// <summary>
-    /// The length of a KSUID when string (base62) encoded
+    /// The length of a KSUID when string (base62) encoded.
     /// </summary>
-    const int StringEncodedLength = 27;
+    private const int StringEncodedLength = 27;
 
     /// <summary>
     /// Timestamp is a uint32.
     /// </summary>
-    const int TimestampLengthInBytes = 4;
+    private const int TimestampLengthInBytes = 4;
 
     /// <summary>
     /// Payload is 16-bytes.
     /// </summary>
-    const int PayloadLengthInBytes = 16;
+    private const int PayloadLengthInBytes = 16;
 
     /// <summary>
     /// KSUIDs are 20 bytes when binary encoded.
     /// </summary>
-    const int ByteLength = TimestampLengthInBytes + PayloadLengthInBytes;
+    private const int ByteLength = TimestampLengthInBytes + PayloadLengthInBytes;
 
     /// <summary>
     /// KSUID's epoch starts more recently so that the 32-bit number space gives a
     /// significantly higher useful lifetime of around 136 years from March 2017.
     /// This number (14e8) was picked to be easy to remember.
     /// </summary>
-    const long KsuidOffsetFromUnixEpochSeconds = 1_400_000_000;
+    private const long KsuidOffsetFromUnixEpochSeconds = 1_400_000_000;
 
     /// <summary>
     /// The number of seconds at Unix epoch.
     /// </summary>
-    const long UnixEpochSeconds = 62_135_596_800;
+    private const long UnixEpochSeconds = 62_135_596_800;
 
-    const long KsuidEpochSeconds = UnixEpochSeconds + KsuidOffsetFromUnixEpochSeconds;
+    /// <summary>
+    /// The number of seconds at KSUID epoch.
+    /// </summary>
+    private const long KsuidEpochSeconds = UnixEpochSeconds + KsuidOffsetFromUnixEpochSeconds;
 
+    /// <summary>
+    /// The maximum length of the prefix string.
+    /// </summary>
     public const int MaxPrefixLength = 4;
 
+    /// <summary>
+    /// Gets a <see cref="DateTime" /> object that is set to the end of the KSUID epoch expressed in UTC.
+    /// </summary>
     public static readonly DateTime MaxTimestamp = new(678305640950000000L, DateTimeKind.Utc);
 
+    /// <summary>
+    /// Gets a <see cref="DateTime" /> object that is set to the beginning of the KSUID epoch expressed in UTC.
+    /// </summary>
     public static readonly DateTime MinTimestamp = new(KsuidEpochSeconds * TimeSpan.TicksPerSecond, DateTimeKind.Utc);
 
     /// <summary>
-    /// Generates a random KSUID using the current time.
+    /// The smallest payload value.
     /// </summary>
-    /// <returns></returns>
+    public static readonly IReadOnlyList<byte> MinPayload = Array.AsReadOnly(Enumerable.Range(0, 16).Select(_ => (byte)0x00).ToArray());
+
+    /// <summary>
+    /// The largest payload value.
+    /// </summary>
+    public static readonly IReadOnlyList<byte> MaxPayload = Array.AsReadOnly(Enumerable.Range(0, 16).Select(_ => (byte)0xFF).ToArray());
+
+    /// <summary>
+    /// The largest KSUID value encoded in base 62.
+    /// </summary>
+    public static readonly string MaxString = "aWgEPTl1tmebfsQzFP4bxwgy80V";
+
+    /// <summary>
+    /// The smallest KSUID value encoded in base 62.
+    /// </summary>
+    public static readonly string MinString = "000000000000000000000000000";
+
+    /// <summary>
+    /// Generates a random KSUID using the current time expressed in UTC.
+    /// </summary>
+    /// <returns>A 20-byte KSUID encoded in Base 62.</returns>
     public static string NewKsuid() => NewKsuid(DateTime.UtcNow);
 
     /// <summary>
-    /// Generates a random KSUID using the specified time.
+    /// Generates a random KSUID using the specified time expressed in UTC.
     /// </summary>
-    /// <param name="utcTime">A DateTime object in UTC format.</param>
+    /// <param name="utcTime">A DateTime object expressed in UTC.</param>
     public static string NewKsuid(DateTime utcNow) => NewKsuid(utcNow, default);
 
     /// <summary>
-    /// Generates a random KSUID using the current time and prefix.
+    /// Generates a random KSUID using the current time expressed in UTC with a prefix.
     /// </summary>
     /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
-    /// <returns>A 20-byte KSUID encoded in Base 62 format.</returns>
+    /// <returns>A 20-byte KSUID encoded in Base 62.</returns>
     public static string NewKsuid(ReadOnlySpan<char> prefix) => NewKsuid(DateTime.UtcNow, prefix);
 
     /// <summary>
-    /// Generates a random KSUID using the current time and prefix.
+    /// Generates a random KSUID using the current time expressed in UTC with a prefix.
     /// </summary>
     /// <param name="utcTime">A DateTime object in UTC format.</param>
     /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
@@ -77,7 +112,7 @@ public static class Ksuid
         => NewKsuid(RandomNumberGenerator.Create(), utcTime, prefix);
 
     /// <summary>
-    /// Generates a random KSUID using the specified RNG, time, and prefix.
+    /// Generates a random KSUID using the specified RNG, time expressed in UTC, and prefix.
     /// </summary>
     /// <param name="rng">An instance of the RandomNumberGenerator class.</param>
     /// <param name="utcTime">A DateTime object in UTC format.</param>
@@ -86,13 +121,13 @@ public static class Ksuid
     public static string NewKsuid(RandomNumberGenerator rng!!, DateTime utcTime, ReadOnlySpan<char> prefix)
     {
         if (utcTime.Kind is not DateTimeKind.Utc)
-            throw new ArgumentException("Parameter is not in UTC.", nameof(utcTime));
+            throw new ArgumentException("The timestamp is not represented in UTC.", nameof(utcTime));
         
         if (utcTime < MinTimestamp || MaxTimestamp < utcTime)
-            throw new ArgumentOutOfRangeException(nameof(utcTime), "Timestamp out of range.");
+            throw new ArgumentOutOfRangeException(nameof(utcTime), "The timestamp is out of range.");
 
         if (prefix.Length > MaxPrefixLength)
-            throw new ArgumentOutOfRangeException(nameof(prefix), $"Prefix length should be fewer than {MaxPrefixLength} characters in length.");
+            throw new ArgumentOutOfRangeException(nameof(prefix), $"The prefix should be fewer than {MaxPrefixLength} characters.");
 
         // allocate 20 bytes to hold the entire KSUID value
         Span<byte> ksuid = stackalloc byte[ByteLength];

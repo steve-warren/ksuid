@@ -4,9 +4,9 @@ namespace KsuidDotNet.Tests;
 
 public class RngStub : RandomNumberGenerator
 {
-    private readonly byte[] _data;
+    private readonly IReadOnlyList<byte> _data;
 
-    public RngStub(byte[] data)
+    public RngStub(IReadOnlyList<byte> data)
     {
         _data = data;
     }
