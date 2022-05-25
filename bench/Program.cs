@@ -1,4 +1,4 @@
 ﻿using BenchmarkDotNet.Running;
-using Ksuid.Bench;
+using KsuidDotNet.Bench;
 
 BenchmarkRunner.Run<KsuidBenchmark>();

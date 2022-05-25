@@ -1,6 +1,5 @@
-﻿using System.Security.Cryptography;
-using Ksuid;
+﻿using KsuidDotNet;
 
 Console.ForegroundColor = ConsoleColor.Cyan;
-
-Console.WriteLine(KsuidFactory.New(RandomNumberGenerator.Create(), DateTime.UtcNow, "cu_"));
+var id = Ksuid.NewKsuid("cu_");
+Console.WriteLine(id);

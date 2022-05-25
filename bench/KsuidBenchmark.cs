@@ -1,16 +1,14 @@
 using System.Security.Cryptography;
 using BenchmarkDotNet.Attributes;
 
-namespace Ksuid.Bench;
+namespace KsuidDotNet.Bench;
 
 [MemoryDiagnoser]
 public class KsuidBenchmark
 {
-    readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();
-
-	[Benchmark]
+    [Benchmark]
     public void KsuidTest()
     {
-		_ = KsuidFactory.New("cu_");
+		_ = Ksuid.NewKsuid(RandomNumberGenerator.Create(), DateTime.UtcNow, "cu_");
 	}
 }
