@@ -20,6 +20,12 @@ public class KsuidBenchmark
     [Benchmark]
     public void DotKsuid_GenerateToString()
     {
+        _ = DotKsuid.Ksuid.NewKsuid().ToString();
+    }
+
+    [Benchmark]
+    public void ksuid_GenerateToString()
+    {
         _ = KSUID.Ksuid.Generate().ToString();
     }
 
@@ -38,6 +44,13 @@ public class KsuidBenchmark
     [Benchmark]
     public void DotKsuid_GenerateToStringWithPrefix()
     {
+        _ = "c_" + DotKsuid.Ksuid.NewKsuid().ToString();
+    }
+
+    [Benchmark]
+    public void ksuid_GenerateToStringWithPrefix()
+    {
         _ = "c_" + KSUID.Ksuid.Generate().ToString();
     }
+
 }
