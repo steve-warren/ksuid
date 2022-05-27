@@ -1,4 +1,4 @@
-# ksuid
+# ksuid [![nuget](https://img.shields.io/nuget/v/KsuidDotNet?style=flat-square)](https://www.nuget.org/packages/KsuidDotNet)
 
 This is a dotnet implementation of [Segment's K-Sortable Globally Unique Identifiers](https://github.com/segmentio/ksuid).
 
