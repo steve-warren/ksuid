@@ -8,7 +8,7 @@ tl;dr
 
 - targets .net standard 2.1
 - blazing-fast performance
-- virtually no memory overhead
+- no memory overhead, alloc only for string
 - thread-safe and lock-free
 - uses crypto PRNG to generate random bits
 - unit-tested
