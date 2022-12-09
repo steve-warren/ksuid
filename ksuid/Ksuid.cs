@@ -118,7 +118,7 @@ public static class Ksuid
     /// <param name="utcTime">A DateTime object in UTC format.</param>
     /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
     /// <returns>A 20-byte KSUID encoded in Base 62 format.</returns>
-    public static string NewKsuid(RandomNumberGenerator rng!!, DateTime utcTime, ReadOnlySpan<char> prefix)
+    public static string NewKsuid(RandomNumberGenerator rng, DateTime utcTime, ReadOnlySpan<char> prefix)
     {
         if (utcTime.Kind is not DateTimeKind.Utc)
             throw new ArgumentException("The timestamp is not represented in UTC.", nameof(utcTime));
