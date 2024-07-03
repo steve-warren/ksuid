@@ -7,7 +7,8 @@ namespace KsuidDotNet;
 /// </summary>
 public static class Ksuid
 {
-    private const string Base62Characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    private const string Base62Characters =
+        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private const int DestBase = 62;
     private const ulong SourceBase = 4_294_967_296;
 
@@ -51,7 +52,7 @@ public static class Ksuid
     /// <summary>
     /// The maximum length of the prefix string.
     /// </summary>
-    public const int MaxPrefixLength = 4;
+    public const int MaxPrefixLength = 5;
 
     /// <summary>
     /// Gets a <see cref="DateTime" /> object that is set to the end of the KSUID epoch expressed in UTC.
@@ -61,17 +62,22 @@ public static class Ksuid
     /// <summary>
     /// Gets a <see cref="DateTime" /> object that is set to the beginning of the KSUID epoch expressed in UTC.
     /// </summary>
-    public static readonly DateTime MinTimestamp = new(KsuidEpochSeconds * TimeSpan.TicksPerSecond, DateTimeKind.Utc);
+    public static readonly DateTime MinTimestamp =
+        new(KsuidEpochSeconds * TimeSpan.TicksPerSecond, DateTimeKind.Utc);
 
     /// <summary>
     /// The smallest payload value.
     /// </summary>
-    public static readonly IReadOnlyList<byte> MinPayload = Array.AsReadOnly(Enumerable.Range(0, 16).Select(_ => (byte)0x00).ToArray());
+    public static readonly IReadOnlyList<byte> MinPayload = Array.AsReadOnly(
+        Enumerable.Range(0, 16).Select(_ => (byte)0x00).ToArray()
+    );
 
     /// <summary>
     /// The largest payload value.
     /// </summary>
-    public static readonly IReadOnlyList<byte> MaxPayload = Array.AsReadOnly(Enumerable.Range(0, 16).Select(_ => (byte)0xFF).ToArray());
+    public static readonly IReadOnlyList<byte> MaxPayload = Array.AsReadOnly(
+        Enumerable.Range(0, 16).Select(_ => (byte)0xFF).ToArray()
+    );
 
     /// <summary>
     /// The largest KSUID value encoded in base 62.
@@ -108,8 +114,8 @@ public static class Ksuid
     /// <param name="utcTime">A DateTime object in UTC format.</param>
     /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
     /// <returns>A 20-byte KSUID encoded in Base 62 format.</returns>
-    public static string NewKsuid(DateTime utcTime, ReadOnlySpan<char> prefix)
-        => NewKsuid(RandomNumberGenerator.Create(), utcTime, prefix);
+    public static string NewKsuid(DateTime utcTime, ReadOnlySpan<char> prefix) =>
+        NewKsuid(RandomNumberGenerator.Create(), utcTime, prefix);
 
     /// <summary>
     /// Generates a random KSUID using the specified RNG, time expressed in UTC, and prefix.
@@ -118,16 +124,29 @@ public static class Ksuid
     /// <param name="utcTime">A DateTime object in UTC format.</param>
     /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
     /// <returns>A 20-byte KSUID encoded in Base 62 format.</returns>
-    public static string NewKsuid(RandomNumberGenerator rng, DateTime utcTime, ReadOnlySpan<char> prefix)
+    public static string NewKsuid(
+        RandomNumberGenerator rng,
+        DateTime utcTime,
+        ReadOnlySpan<char> prefix
+    )
     {
         if (utcTime.Kind is not DateTimeKind.Utc)
-            throw new ArgumentException("The timestamp is not represented in UTC.", nameof(utcTime));
-        
+            throw new ArgumentException(
+                "The timestamp is not represented in UTC.",
+                nameof(utcTime)
+            );
+
         if (utcTime < MinTimestamp || MaxTimestamp < utcTime)
-            throw new ArgumentOutOfRangeException(nameof(utcTime), "The timestamp is out of range.");
+            throw new ArgumentOutOfRangeException(
+                nameof(utcTime),
+                "The timestamp is out of range."
+            );
 
         if (prefix.Length > MaxPrefixLength)
-            throw new ArgumentOutOfRangeException(nameof(prefix), $"The prefix should be fewer than {MaxPrefixLength} characters.");
+            throw new ArgumentOutOfRangeException(
+                nameof(prefix),
+                $"The prefix should be fewer than {MaxPrefixLength} characters."
+            );
 
         // allocate 20 bytes to hold the entire KSUID value
         Span<byte> ksuid = stackalloc byte[ByteLength];
@@ -141,10 +160,10 @@ public static class Ksuid
 
         // stores the time value in the first 4
         // bytes of the KSUID, encoding it into big endian
-        ksuid[0] = (byte) (ts >> 24);
-        ksuid[1] = (byte) (ts >> 16);
-        ksuid[2] = (byte) (ts >> 8);
-        ksuid[3] = (byte) ts;
+        ksuid[0] = (byte)(ts >> 24);
+        ksuid[1] = (byte)(ts >> 16);
+        ksuid[2] = (byte)(ts >> 8);
+        ksuid[3] = (byte)ts;
 
         var prefixLength = prefix.Length;
 
@@ -153,15 +172,15 @@ public static class Ksuid
 
         // encodes the KSUID into base 62
         Span<uint> quotient = stackalloc uint[5];
-        Span<uint> parts = stackalloc uint[5]
-        {
-            ksuid[3] | (uint)ksuid[2] << 8 | (uint)ksuid[1] << 16 | (uint)ksuid[0] << 24,
-            ksuid[7] | (uint)ksuid[6] << 8 | (uint)ksuid[5] << 16 | (uint)ksuid[4] << 24,
-            ksuid[11] | (uint)ksuid[10] << 8 | (uint)ksuid[9] << 16 | (uint)ksuid[8] << 24,
-            ksuid[15] | (uint)ksuid[14] << 8 | (uint)ksuid[13] << 16 | (uint)ksuid[12] << 24,
-            ksuid[19] | (uint)ksuid[18] << 8 | (uint)ksuid[17] << 16 | (uint)ksuid[16] << 24
-        };
-        
+        Span<uint> parts =
+            stackalloc uint[5] {
+                ksuid[3] | (uint)ksuid[2] << 8 | (uint)ksuid[1] << 16 | (uint)ksuid[0] << 24,
+                ksuid[7] | (uint)ksuid[6] << 8 | (uint)ksuid[5] << 16 | (uint)ksuid[4] << 24,
+                ksuid[11] | (uint)ksuid[10] << 8 | (uint)ksuid[9] << 16 | (uint)ksuid[8] << 24,
+                ksuid[15] | (uint)ksuid[14] << 8 | (uint)ksuid[13] << 16 | (uint)ksuid[12] << 24,
+                ksuid[19] | (uint)ksuid[18] << 8 | (uint)ksuid[17] << 16 | (uint)ksuid[16] << 24
+            };
+
         // the length of the KSUID is always 27 chars
         var n = StringEncodedLength;
         var partsLength = parts.Length;
@@ -175,7 +194,7 @@ public static class Ksuid
             ulong remainder = 0;
             int quotientLength = 0;
 
-            for (var i = 0; i < partsLength; i ++)
+            for (var i = 0; i < partsLength; i++)
             {
                 ulong value = parts[i] + remainder * SourceBase;
                 ulong digit = value / DestBase;
@@ -183,7 +202,7 @@ public static class Ksuid
 
                 if (quotientLength != 0 || digit != 0)
                 {
-                    quotient[quotientLength] = (uint) digit;
+                    quotient[quotientLength] = (uint)digit;
                     quotientLength++;
                 }
             }
@@ -196,7 +215,7 @@ public static class Ksuid
             dest[prefixLength + n] = Base62Characters[(int)remainder];
 
             // copy quotient to parts
-            for (var i = 0; i < quotientLength; i ++)
+            for (var i = 0; i < quotientLength; i++)
                 parts[i] = quotient[i];
 
             // count the remaining parts
@@ -205,10 +224,10 @@ public static class Ksuid
 
         // Add padding at the head of the destination buffer for all bytes that were
         // not set.
-        while(n-- > 0)
+        while (n-- > 0)
             dest[prefixLength + n] = '0';
 
-        while(prefixLength-- > 0)
+        while (prefixLength-- > 0)
             dest[prefixLength] = prefix[prefixLength];
 
         return new string(dest);
