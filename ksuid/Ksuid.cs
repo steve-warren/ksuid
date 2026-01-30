@@ -156,12 +156,20 @@ public static class Ksuid
     {
         var totalLength = prefix.Length + StringEncodedLength;
 
+        // Copy RNG bytes into stack-allocated buffer to avoid taking pointers to GC-managed memory.
+        Span<byte> rngCopy = stackalloc byte[PayloadLengthInBytes];
+        rngBytes.Slice(0, PayloadLengthInBytes).CopyTo(rngCopy);
+
+        // Copy prefix into stack-allocated buffer for the same reason.
+        Span<char> prefixCopy = stackalloc char[prefix.Length];
+        prefix.CopyTo(prefixCopy);
+
         return string.Create(
             totalLength,
             (
-                rngPtr: (IntPtr)Unsafe.AsPointer(ref MemoryMarshal.GetReference(rngBytes)),
+                rngPtr: (IntPtr)Unsafe.AsPointer(ref MemoryMarshal.GetReference(rngCopy)),
                 utcTime,
-                prefixPtr: (IntPtr)Unsafe.AsPointer(ref MemoryMarshal.GetReference(prefix)),
+                prefixPtr: (IntPtr)Unsafe.AsPointer(ref MemoryMarshal.GetReference(prefixCopy)),
                 prefixLen: prefix.Length
             ),
             FillKsuidBuffer
