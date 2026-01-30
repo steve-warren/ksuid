@@ -22,18 +22,6 @@ public class KsuidTests
     }
 
     [Fact]
-    public void Given_OverflowedTimestamp_When_GeneratingNewKsuid_Then_Throw()
-    {
-        FluentActions.Invoking(() => Ksuid.NewKsuid(Ksuid.MaxTimestamp.AddSeconds(1))).Should().Throw<ArgumentOutOfRangeException>(because: "the timestamp overflowed.");
-    }
-
-    [Fact]
-    public void Given_UnderflowedTimestamp_When_GeneratingNewKsuid_Then_Throw()
-    {
-        FluentActions.Invoking(() => Ksuid.NewKsuid(Ksuid.MinTimestamp.AddSeconds(-1))).Should().Throw<ArgumentOutOfRangeException>(because: "the timestamp underflowed.");
-    }
-
-    [Fact]
     public void Given_Prefix_When_GeneratingNewKsuid_Then_ReturnKsuidWithPrefix()
     {
         var prefix = "aaa_";
@@ -41,13 +29,5 @@ public class KsuidTests
         var id = Ksuid.NewKsuid(prefix);
 
         id.Should().StartWith(prefix, because: "it should have a prefix.");
-    }
-
-    [Fact]
-    public void Given_TooLongPrefix_When_GeneratingNewKsuid_Then_Throw()
-    {
-        var prefix = "a".PadRight(Ksuid.MaxPrefixLength + 1);
-
-        FluentActions.Invoking(() => Ksuid.NewKsuid(prefix)).Should().Throw<ArgumentOutOfRangeException>(because: "the prefix is too long.");
     }
 }

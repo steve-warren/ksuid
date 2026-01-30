@@ -6,51 +6,50 @@ namespace KsuidDotNet.Bench;
 public class KsuidBenchmark
 {
     [Benchmark]
-    public void KsuidDotNet_NewKsuid()
+    public string KsuidDotNet_NewKsuid()
     {
-        _ = KsuidDotNet.Ksuid.NewKsuid();
+        return KsuidDotNet.Ksuid.NewKsuid();
     }
 
     [Benchmark]
-    public void StructKsuid_RandomKsuidToString()
+    public string KsuidDotNet_NewKsuid_WithPrefix()
     {
-        _ = StructKsuid.Ksuid.RandomKsuid().ToString();
+        return KsuidDotNet.Ksuid.NewKsuid("c_");
     }
 
     [Benchmark]
-    public void DotKsuid_GenerateToString()
+    public string StructKsuid_RandomKsuidToString()
     {
-        _ = DotKsuid.Ksuid.NewKsuid().ToString();
+        return StructKsuid.Ksuid.RandomKsuid().ToString();
     }
 
     [Benchmark]
-    public void ksuid_GenerateToString()
+    public string StructKsuid_RandomKsuidToStringWithPrefix()
     {
-        _ = KSUID.Ksuid.Generate().ToString();
+        return "c_" + StructKsuid.Ksuid.RandomKsuid().ToString();
     }
 
     [Benchmark]
-    public void KsuidDotNet_NewKsuid_WithPrefix()
+    public string DotKsuid_GenerateToString()
     {
-        _ = KsuidDotNet.Ksuid.NewKsuid("c_");
+        return DotKsuid.Ksuid.NewKsuid().ToString();
     }
 
     [Benchmark]
-    public void StructKsuid_RandomKsuidToStringWithPrefix()
+    public string DotKsuid_GenerateToStringWithPrefix()
     {
-        _ = "c_" + StructKsuid.Ksuid.RandomKsuid().ToString();
+        return "c_" + DotKsuid.Ksuid.NewKsuid().ToString();
     }
 
     [Benchmark]
-    public void DotKsuid_GenerateToStringWithPrefix()
+    public string ksuid_GenerateToString()
     {
-        _ = "c_" + DotKsuid.Ksuid.NewKsuid().ToString();
+        return KSUID.Ksuid.Generate().ToString();
     }
 
     [Benchmark]
-    public void ksuid_GenerateToStringWithPrefix()
+    public string ksuid_GenerateToStringWithPrefix()
     {
-        _ = "c_" + KSUID.Ksuid.Generate().ToString();
+        return "c_" + KSUID.Ksuid.Generate().ToString();
     }
-
 }
