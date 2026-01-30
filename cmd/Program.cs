@@ -27,7 +27,7 @@ _ = Task.Run(async () =>
             break;
         }
 
-        Console.WriteLine(count);
+        Console.WriteLine($"{count} - {id}");
     }
 });
 

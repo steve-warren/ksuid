@@ -52,11 +52,6 @@ public static class Ksuid
     private const long KsuidEpochSeconds = UnixEpochSeconds + KsuidOffsetFromUnixEpochSeconds;
 
     /// <summary>
-    /// The maximum length of the prefix string.
-    /// </summary>
-    public const int MaxPrefixLength = 5;
-
-    /// <summary>
     /// Gets a <see cref="DateTime" /> object that is set to the end of the KSUID epoch expressed in UTC.
     /// </summary>
     public static readonly DateTime MaxTimestamp = new(678305640950000000L, DateTimeKind.Utc);
@@ -113,7 +108,7 @@ public static class Ksuid
     /// Generates a random KSUID using the current time expressed in UTC with a prefix.
     /// </summary>
     /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
-    /// <returns>A 20-byte/27-character KSUID encoded in Base 62.</returns>
+    /// <returns>A 20-byte/27-character KSUID (+prefix) encoded in Base 62.</returns>
     public static string NewKsuid(ReadOnlySpan<char> prefix) => NewKsuid(DateTime.UtcNow, prefix);
 
     /// <summary>
@@ -121,7 +116,7 @@ public static class Ksuid
     /// </summary>
     /// <param name="utcTime">A DateTime object in UTC format.</param>
     /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
-    /// <returns>A 20-byte/27-character KSUID encoded in Base 62.</returns>
+    /// <returns>A 20-byte/27-character KSUID (+prefix) encoded in Base 62.</returns>
     public static string NewKsuid(DateTime utcTime, ReadOnlySpan<char> prefix)
     {
         var entropy = tlsBuffer_.Value!;
@@ -135,7 +130,7 @@ public static class Ksuid
     /// <param name="rng">An instance of the RandomNumberGenerator class.</param>
     /// <param name="utcTime">A DateTime object in UTC format.</param>
     /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
-    /// <returns>A 20-byte/27-character KSUID encoded in Base 62.</returns>
+    /// <returns>A 20-byte/27-character KSUID (+prefix) encoded in Base 62.</returns>
     public static string NewKsuid(
         RandomNumberGenerator rng,
         DateTime utcTime,
@@ -156,11 +151,9 @@ public static class Ksuid
     {
         var totalLength = prefix.Length + StringEncodedLength;
 
-        // Copy RNG bytes into stack-allocated buffer to avoid taking pointers to GC-managed memory.
         Span<byte> rngCopy = stackalloc byte[PayloadLengthInBytes];
         rngBytes.Slice(0, PayloadLengthInBytes).CopyTo(rngCopy);
 
-        // Copy prefix into stack-allocated buffer for the same reason.
         Span<char> prefixCopy = stackalloc char[prefix.Length];
         prefix.CopyTo(prefixCopy);
 
@@ -203,14 +196,14 @@ public static class Ksuid
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void EncodeBase62(ReadOnlySpan<byte> source, Span<char> destination)
     {
-        Span<uint> parts = stackalloc uint[5];
-
-        parts[0] = BinaryPrimitives.ReadUInt32BigEndian(source.Slice(0, 4));
-        parts[1] = BinaryPrimitives.ReadUInt32BigEndian(source.Slice(4, 4));
-        parts[2] = BinaryPrimitives.ReadUInt32BigEndian(source.Slice(8, 4));
-        parts[3] = BinaryPrimitives.ReadUInt32BigEndian(source.Slice(12, 4));
-        parts[4] = BinaryPrimitives.ReadUInt32BigEndian(source.Slice(16, 4));
-
+        Span<uint> parts =
+        [
+            BinaryPrimitives.ReadUInt32BigEndian(source.Slice(0, 4)),
+            BinaryPrimitives.ReadUInt32BigEndian(source.Slice(4, 4)),
+            BinaryPrimitives.ReadUInt32BigEndian(source.Slice(8, 4)),
+            BinaryPrimitives.ReadUInt32BigEndian(source.Slice(12, 4)),
+            BinaryPrimitives.ReadUInt32BigEndian(source.Slice(16, 4)),
+        ];
         var n = StringEncodedLength;
         var partsLen = 5;
 
