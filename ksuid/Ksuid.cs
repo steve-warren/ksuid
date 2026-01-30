@@ -20,7 +20,7 @@ public static class Ksuid
     private const int StringEncodedLength = 27;
 
     /// <summary>
-    /// Timestamp is an uint32.
+    /// Timestamp is a uint32.
     /// </summary>
     private const int TimestampLengthInBytes = 4;
 
