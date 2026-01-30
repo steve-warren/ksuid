@@ -12,8 +12,7 @@ public static class Ksuid
 {
     private const int BufferSize = 4096;
 
-    private static readonly ThreadLocal<EntropyBuffer> tlsBuffer_ =
-        new(() => new EntropyBuffer());
+    private static readonly ThreadLocal<EntropyBuffer> tlsBuffer_ = new(() => new EntropyBuffer());
 
     /// <summary>
     /// The length of a KSUID when string (base62) encoded.
@@ -65,8 +64,10 @@ public static class Ksuid
     /// <summary>
     /// Gets a <see cref="DateTime" /> object that is set to the beginning of the KSUID epoch expressed in UTC.
     /// </summary>
-    public static readonly DateTime MinTimestamp =
-        new(KsuidEpochSeconds * TimeSpan.TicksPerSecond, DateTimeKind.Utc);
+    public static readonly DateTime MinTimestamp = new(
+        KsuidEpochSeconds * TimeSpan.TicksPerSecond,
+        DateTimeKind.Utc
+    );
 
     /// <summary>
     /// The smallest payload value.
@@ -121,9 +122,7 @@ public static class Ksuid
     /// <param name="utcTime">A DateTime object in UTC format.</param>
     /// <param name="prefix">A string of text to prepend the KSUID. The prefix should be short.</param>
     /// <returns>A 20-byte/27-character KSUID encoded in Base 62.</returns>
-    public static string NewKsuid(
-        DateTime utcTime,
-        ReadOnlySpan<char> prefix)
+    public static string NewKsuid(DateTime utcTime, ReadOnlySpan<char> prefix)
     {
         var entropy = tlsBuffer_.Value!;
         var rng = entropy.GetNextBytes();
@@ -140,7 +139,8 @@ public static class Ksuid
     public static string NewKsuid(
         RandomNumberGenerator rng,
         DateTime utcTime,
-        ReadOnlySpan<char> prefix)
+        ReadOnlySpan<char> prefix
+    )
     {
         Span<byte> rngBytes = stackalloc byte[16];
         rng.GetBytes(rngBytes);
@@ -151,24 +151,27 @@ public static class Ksuid
     private static unsafe string NewKsuid(
         ReadOnlySpan<byte> rngBytes,
         DateTime utcTime,
-        ReadOnlySpan<char> prefix)
+        ReadOnlySpan<char> prefix
+    )
     {
-        // This allocates the string once on the heap and gives us a span
-        // to write directly into its memory.
         var totalLength = prefix.Length + StringEncodedLength;
 
         return string.Create(
             totalLength,
-            (rngPtr: (IntPtr)Unsafe.AsPointer(ref MemoryMarshal.GetReference(rngBytes)),
+            (
+                rngPtr: (IntPtr)Unsafe.AsPointer(ref MemoryMarshal.GetReference(rngBytes)),
                 utcTime,
-                prefixPtr: (IntPtr)Unsafe.AsPointer(
-                    ref MemoryMarshal.GetReference(prefix)),
-                prefixLen: prefix.Length), FillKsuidBuffer);
+                prefixPtr: (IntPtr)Unsafe.AsPointer(ref MemoryMarshal.GetReference(prefix)),
+                prefixLen: prefix.Length
+            ),
+            FillKsuidBuffer
+        );
     }
 
     private static unsafe void FillKsuidBuffer(
         Span<char> span,
-        (IntPtr rngPtr, DateTime utcTime, IntPtr prefixPtr, int prefixLength) state)
+        (IntPtr rngPtr, DateTime utcTime, IntPtr prefixPtr, int prefixLength) state
+    )
     {
         // recover the prefix span from the state
         var prefixSpan = new ReadOnlySpan<char>(state.prefixPtr.ToPointer(), state.prefixLength);
@@ -188,7 +191,6 @@ public static class Ksuid
         // encode directly into the tail of the string span
         EncodeBase62(binaryBuffer, span.Slice(state.prefixLength));
     }
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void EncodeBase62(ReadOnlySpan<byte> source, Span<char> destination)
