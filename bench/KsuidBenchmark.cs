@@ -1,55 +1,40 @@
+using System.Security.Cryptography;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Jobs;
 
 namespace KsuidDotNet.Bench;
 
 [MemoryDiagnoser]
-public class KsuidBenchmark
+[HideColumns("Error", "StdDev", "RatioSD")] // Clean up the output
+[MinColumn, MaxColumn, OperationsPerSecond]
+[SimpleJob]
+public class KsuidPerformanceBenchmarks
 {
-    [Benchmark]
-    public string KsuidDotNet_NewKsuid()
-    {
-        return KsuidDotNet.Ksuid.NewKsuid();
-    }
+  private readonly DateTime _timestamp = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+  private readonly byte[] _entropy = new byte[16];
+  private readonly string _prefix = "test_";
 
-    [Benchmark]
-    public string KsuidDotNet_NewKsuid_WithPrefix()
-    {
-        return KsuidDotNet.Ksuid.NewKsuid("c_");
-    }
+  [GlobalSetup]
+  public void Setup()
+  {
+    RandomNumberGenerator.Fill(_entropy);
+  }
 
-    [Benchmark]
-    public string StructKsuid_RandomKsuidToString()
-    {
-        return StructKsuid.Ksuid.RandomKsuid().ToString();
-    }
+  [Benchmark(Description = "NewKsuid() - Real World")]
+  public string RealWorldGeneration()
+  {
+    return Ksuid.NewKsuid();
+  }
 
-    [Benchmark]
-    public string StructKsuid_RandomKsuidToStringWithPrefix()
-    {
-        return "c_" + StructKsuid.Ksuid.RandomKsuid().ToString();
-    }
+  [Benchmark(Description = "NewKsuid(Prefix) - Real World")]
+  public string RealWorldGenerationWithPrefix()
+  {
+    return Ksuid.NewKsuid(_prefix);
+  }
 
-    [Benchmark]
-    public string DotKsuid_GenerateToString()
-    {
-        return DotKsuid.Ksuid.NewKsuid().ToString();
-    }
-
-    [Benchmark]
-    public string DotKsuid_GenerateToStringWithPrefix()
-    {
-        return "c_" + DotKsuid.Ksuid.NewKsuid().ToString();
-    }
-
-    [Benchmark]
-    public string ksuid_GenerateToString()
-    {
-        return KSUID.Ksuid.Generate().ToString();
-    }
-
-    [Benchmark]
-    public string ksuid_GenerateToStringWithPrefix()
-    {
-        return "c_" + KSUID.Ksuid.Generate().ToString();
-    }
+  [Benchmark(Description = "NewKsuid(DateTime, Prefix) - Deterministic")]
+  public string DeterministicGeneration()
+  {
+    return Ksuid.NewKsuid(_timestamp, _prefix);
+  }
 }
