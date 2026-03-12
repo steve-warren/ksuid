@@ -53,6 +53,25 @@ Console.WriteLine(id); // outputs c_29faSiN1gPB6IzM74u6tMfTO02L
 
 Benchmark results for KsuidDotNet and other KSUID libraries.
 
+### X64: Ryzen 9950X3D
+
+```
+```
+BenchmarkDotNet v0.15.6, Windows 11 (10.0.26200.8037)
+AMD Ryzen 9 9950X3D 4.30GHz, 1 CPU, 32 logical and 16 physical cores
+.NET SDK 10.0.104
+  [Host]     : .NET 10.0.4 (10.0.4, 10.0.426.12010), X64 RyuJIT x86-64-v4
+  DefaultJob : .NET 10.0.4 (10.0.4, 10.0.426.12010), X64 RyuJIT x86-64-v4
+
+| Method                                       | Mean     | Min      | Max      | Op/s         | Gen0   | Allocated |
+|--------------------------------------------- |---------:|---------:|---------:|-------------:|-------:|----------:|
+| 'NewKsuid() - Real World'                    | 62.27 ns | 62.13 ns | 62.36 ns | 16,059,914.6 | 0.0015 |      80 B |
+| 'NewKsuid(Prefix) - Real World'              | 63.03 ns | 62.66 ns | 63.27 ns | 15,865,375.5 | 0.0017 |      88 B |
+| 'NewKsuid(DateTime, Prefix) - Deterministic' | 43.31 ns | 43.19 ns | 43.41 ns | 23,089,671.4 | 0.0017 |      88 B |
+```
+
+
+```
 ### ARM64: M2 Ultra
 BenchmarkDotNet v0.15.6, macOS Sequoia 15.4 (24E248) [Darwin 24.4.0]
 Apple M2 Ultra, 1 CPU, 24 logical and 24 physical cores
