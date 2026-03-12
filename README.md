@@ -56,7 +56,6 @@ Benchmark results for KsuidDotNet and other KSUID libraries.
 ### X64: Ryzen 9950X3D
 
 ```
-```
 BenchmarkDotNet v0.15.6, Windows 11 (10.0.26200.8037)
 AMD Ryzen 9 9950X3D 4.30GHz, 1 CPU, 32 logical and 16 physical cores
 .NET SDK 10.0.104
@@ -69,7 +68,6 @@ AMD Ryzen 9 9950X3D 4.30GHz, 1 CPU, 32 logical and 16 physical cores
 | 'NewKsuid(Prefix) - Real World'              | 63.03 ns | 62.66 ns | 63.27 ns | 15,865,375.5 | 0.0017 |      88 B |
 | 'NewKsuid(DateTime, Prefix) - Deterministic' | 43.31 ns | 43.19 ns | 43.41 ns | 23,089,671.4 | 0.0017 |      88 B |
 ```
-
 
 ```
 ### ARM64: M2 Ultra
