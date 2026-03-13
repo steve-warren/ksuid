@@ -1,39 +1,38 @@
-﻿using System.Threading.Channels;
+﻿using System.Collections.Concurrent;
 using KsuidDotNet;
 
 Console.ForegroundColor = ConsoleColor.Cyan;
 
-var set = new HashSet<string>();
+var set = new ConcurrentBag<string>();
 
-var channel = Channel.CreateUnbounded<string>(
-    new UnboundedChannelOptions { SingleReader = true, SingleWriter = true }
-);
-
-var flag = 1;
-
-_ = Task.Run(async () =>
+var tasks = Enumerable.Range(0, 32).Select(taskNumber =>
 {
-    var count = 0;
-
-    await foreach (var id in channel.Reader.ReadAllAsync())
+    return Task.Run(() =>
     {
-        count++;
-
-        if (!set.Add(id))
+        for (var i = 0; i < 100_000; i++)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"error: duplicate ksuid {id}");
-            Volatile.Write(ref flag, 0);
-            break;
+            set.Add(Ksuid.NewKsuid());
         }
-
-        Console.WriteLine($"{count} - {id}");
-    }
+    });
 });
 
-while (Volatile.Read(ref flag) == 1)
-{
-    var id = Ksuid.NewKsuid("cust_");
+Task.WaitAll(tasks);
 
-    channel.Writer.TryWrite(id);
+Console.WriteLine(set.Count == 3_200_000 ? "collision pass" : "collision fail");
+
+var lexicalList = new List<string>(100_000);
+var baseTime = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+for (var i = 0; i < 100_000; i++)
+{
+    var simulatedTime = baseTime.AddSeconds(i);
+    lexicalList.Add(Ksuid.NewKsuid(simulatedTime));
 }
+
+var shuffledList = lexicalList.Shuffle().ToList();
+
+var orderedList = shuffledList.OrderBy(x => x, StringComparer.Ordinal).ToList();
+
+var expression = orderedList.SequenceEqual(lexicalList);
+
+Console.WriteLine(expression ? "lexical pass" : "lexical fail");
