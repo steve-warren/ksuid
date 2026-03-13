@@ -3,7 +3,7 @@ using KsuidDotNet;
 
 Console.ForegroundColor = ConsoleColor.Cyan;
 
-var set = new ConcurrentBag<string>();
+var bag = new ConcurrentBag<string>();
 
 var tasks = Enumerable.Range(0, 32).Select(taskNumber =>
 {
@@ -11,12 +11,14 @@ var tasks = Enumerable.Range(0, 32).Select(taskNumber =>
     {
         for (var i = 0; i < 100_000; i++)
         {
-            set.Add(Ksuid.NewKsuid());
+            bag.Add(Ksuid.NewKsuid());
         }
     });
 });
 
 Task.WaitAll(tasks);
+
+var set = new HashSet<string>(bag);
 
 Console.WriteLine(set.Count == 3_200_000 ? "collision pass" : "collision fail");
 
